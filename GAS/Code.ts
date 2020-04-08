@@ -4,28 +4,25 @@
 
 
 export interface Range {
-
-  columnEnd:   number;
+  columnEnd: number;
   columnStart: number;
-  rowEnd:      number;
-  rowStart:    number;
-
+  rowEnd: number;
+  rowStart: number;
 }
 
 export interface User {
-
-  email:    string;
+  email: string;
   nickname: string;
 
 }
 
 export interface SheetEvent {
   authMode: any;
-  oldValue?: string | number;
-  range:    GoogleAppsScript.Spreadsheet.Range & Range;
-  source:   GoogleAppsScript.Spreadsheet.Spreadsheet;
-  triggerUid?: string | number;
-  user:     User;
+  oldValue ? : string | number;
+  range: GoogleAppsScript.Spreadsheet.Range & Range;
+  source: GoogleAppsScript.Spreadsheet.Spreadsheet;
+  triggerUid ? : string | number;
+  user: User;
   value: string | number;
 }
 
@@ -34,49 +31,45 @@ export interface TriggerEvent {
   [key: string]: any;
 }
 
-
 function myFunction() {
-  
   const ss = SpreadsheetApp.getActiveSpreadsheet().getActiveSheet();
-  const ssgantt   = SpreadsheetApp.getActiveSpreadsheet().getSheetByName("Gantt");
+  const ssgantt = SpreadsheetApp.getActiveSpreadsheet().getSheetByName("Gantt");
   const ssmembers = SpreadsheetApp.getActiveSpreadsheet().getSheetByName("Members");
-  
 }
 
-function getRangeByName(name: string, spreadsheet: GoogleAppsScript.Spreadsheet.Spreadsheet = SpreadsheetApp.getActiveSpreadsheet()){
+function getRangeByName(name: string,
+                 spreadsheet: GoogleAppsScript.Spreadsheet.Spreadsheet = SpreadsheetApp.getActiveSpreadsheet()) {
   return spreadsheet.getNamedRanges().find(x => x.getName() == name)?.getRange();
 }
 
 function onEdit(e: SheetEvent) {
-
-  if ( e.range.getRow() < getRangeByName("HEADERS")!.getRow() +1 ) return;
+  // Ensure we are below our headers. Everything above that is manually set.
+  if (e.range.getRow() < getRangeByName("HEADERS")!.getRow() + 1) return;
 
   doTaskUpdateTriggers(e);
- // doStartDateTimeUpdateTriggers(e)
-  
+  // doStartDateTimeUpdateTriggers(e)
 }
 
-
-
-
-
-function doTaskUpdateTriggers(e: SheetEvent){
-  // We don't want to edit anything above the headers.
-  //if ( e.range.getRow() < getRangeByName("HEADERS")!.getRow() +1 ) return;
-  
+/**
+ *  We were
+ *
+ * @param {SheetEvent} e
+ * @return {void} 
+ */
+function doTaskUpdateTriggers(e: SheetEvent): void {
   // We are working below headers
-  if ( e.source.getSheetName() == "Gantt" && e.range.getColumn() == 2) {
+  if (e.source.getSheetName() == "Gantt" && e.range.getColumn() == 2) {
 
     const offset = e.range.offset(0, 1);
     const dataValidation = offset.getDataValidation();
 
     // cell has a value but no validation
     if (e.value && dataValidation == null) {
-      const vr    = e.source.getNamedRanges().find(r => r.getName() == "MEMBER_REF")?.getRange();
-      const rule  = SpreadsheetApp.newDataValidation().requireValueInRange(vr!).build();
+      const vr = e.source.getNamedRanges().find(r => r.getName() == "MEMBER_REF")?.getRange();
+      const rule = SpreadsheetApp.newDataValidation().requireValueInRange(vr!).build();
       offset.setDataValidation(rule);
 
-    // cell doesn't have value but has validation
+      // cell doesn't have value but has validation
     } else if (!e.value && dataValidation) {
       offset.clear().clearDataValidations();
     }
@@ -85,8 +78,8 @@ function doTaskUpdateTriggers(e: SheetEvent){
 
 function doStartDateTimeUpdateTriggers(e: SheetEvent) {
 
-  if(e.range.getColumn() == 5) {
-    
+  if (e.range.getColumn() == 5) {
+
     const cell = e.range;
     const start = new Date(Date.parse(cell.getValue().toString()));
     const durat = parseInt(cell.offset(0, -1).getValue().toString());
@@ -94,20 +87,17 @@ function doStartDateTimeUpdateTriggers(e: SheetEvent) {
     const finish = new Date(start.getTime() + (durat * 60 * 1000));
 
     const write = Utilities.formatDate(finish, "PST", "EEE MM/dd/yy HH:mm");
-  
+
     cell.offset(0, 1).setValue(write);
 
   }
 }
 // https://docs.oracle.com/javase/7/docs/api/java/text/SimpleDateFormat.html
 function Dev(a1: string) {
-
-  
-
- /*  return JSON.stringify({
-    validation: cell.getDataValidation(),
-    forumla: cell.getFormula(),
-    format: cell.getNumberFormat()
-  });
- */
+  /*  return JSON.stringify({
+     validation: cell.getDataValidation(),
+     forumla: cell.getFormula(),
+     format: cell.getNumberFormat()
+   });
+  */
 }
