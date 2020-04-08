@@ -2,7 +2,6 @@
 // https://docs.google.com/spreadsheets/d/1QYop_BS_TuX3mkG_GrUcm80mEUDe9ltANRO4DXaquLM/edit#gid=0
 // https://script.google.com/a/asu.edu/d/1dzK4ZIM_YbEMhHS5Qm5phZxpa2lOEF0bwrX3NH6kT7WvZq6ddGiPfM4T/edit
 
-
 export interface Range {
   columnEnd: number;
   columnStart: number;
@@ -13,7 +12,6 @@ export interface Range {
 export interface User {
   email: string;
   nickname: string;
-
 }
 
 export interface SheetEvent {
@@ -51,7 +49,6 @@ function onEdit(e: SheetEvent) {
 }
 
 /**
- *  We were
  *
  * @param {SheetEvent} e
  * @return {void} 
